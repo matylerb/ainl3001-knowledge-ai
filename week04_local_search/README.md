@@ -441,11 +441,11 @@ Record the final cost.
 
 | Attempt | Final Cost |
 |---|---:|
-| 1 | |
-| 2 | |
-| 3 | |
-| 4 | |
-| 5 | |
+| 1 | 2 |
+| 2 | 1 |
+| 3 | 1 |
+| 4 | 1 |
+| 5 | 1 |
 
 Consider:
 
@@ -516,15 +516,22 @@ Record the best cost you find.
 
 | Algorithm | Best Cost Found |
 |---|---:|
-| Hill Climbing | |
-| Simulated Annealing | |
+| Hill Climbing | 0 |
+| Simulated Annealing | 1 |
 
 Consider the behaviour you observed:
 
 - Do both algorithms always produce the same result?
+  No. Hill climbing on the same starting board will always produce the same result, but SA is random every run so it varies. And both start from a different random board each time anyway.
+
 - Which algorithm shows more variation between runs?
+  Simulated Annealing — because it uses random.choice to pick a random neighbour and random.random() to decide whether to accept worse moves. Two runs with the same starting board can end up in completely different places.
+
 - How does accepting occasional worse moves affect the search?
+  It lets the algorithm escape local minima. Hill climbing gets permanently stuck the moment no neighbour is better. SA can step to a worse board temporarily to get out of that trap and potentially reach a better solution further on.
+
 - What trade-off does Simulated Annealing introduce?
+  You get better exploration but less consistency. Hill climbing is fast and predictable — if it finds 0 conflicts it's done. SA takes longer (runs until temperature hits 0.1 regardless), and even then isn't guaranteed to find a perfect solution because the randomness can also move it away from good states.
 
 
 # 15. Deterministic and Stochastic Search
@@ -584,13 +591,31 @@ Your Git history should show the development of your solution over time.
 Complete these after finishing the main tasks.
 
 1. What is the difference between search and optimisation?
+   Search finds a path from a start state to a goal state 
+   Optimisation finds the best possible state, only the final result matters
+
 2. Why does an optimisation problem require a way to evaluate candidate solutions?
+   Without a cost function like count_conflicts, you have no way to compare two boards and decide which is better. You need a score to know whether you're improving.
+
 3. Why can Hill Climbing become stuck in a local minimum?
+   It only moves to a neighbour if it's strictly better. If every neighbour has an equal or higher cost, it stops, even if a better solution exists elsewhere that would require temporarily getting worse to reach.
+
 4. What is a plateau?
+   A plateau is where multiple neighbouring states all have the same cost as the current state. Hill climbing can't distinguish between them and effectively gets stuck, making no progress.
+
 5. How does Simulated Annealing attempt to overcome the limitations of Hill Climbing?
+   It occasionally accepts worse moves using a probability based on temperature. Early on the temperature is high so bad moves are often accepted, allowing it to escape local minima. As temperature cools it becomes more selective, locking in a good solution.
+
 6. What is the difference between deterministic and stochastic search?
+   Deterministic always makes the same decision given the same state — hill climbing always picks the best neighbour so the same starting board gives the same result every time. Stochastic introduces randomness simulated annealing uses random.choice and random.random() so two runs on the same board can produce different results.
+
 7. How did the `Problem` representation allow us to represent both a grid world and N-Queens?
+
+   Problem defines a common interface — actions(state) and result(state, action) — without knowing anything about grids or queens. GridProblem and QueensProblem each fill in those methods for their own domain. The algorithms just call those two methods and work on any problem.
+
 8. How do optimisation techniques such as these relate to Machine Learning?
+   
+   ML training is the same process — start with random model weights, evaluate a cost function (loss), generate neighbouring solutions (via gradient descent), and move toward lower cost. Techniques like stochastic gradient descent mirror SA by introducing randomness to avoid local minima in the loss landscape.
 
 
 # Extensions

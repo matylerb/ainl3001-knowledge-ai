@@ -241,3 +241,75 @@ if __name__ == "__main__":
     print(
         f"{len(neighbours)} neighbours generated"
     )
+
+    print("\n--- Hill Climbing ---")
+    print("Start board:", board)
+    print("Start cost:", count_conflicts(board))
+    hc_result = hill_climbing(problem, board)
+    print("End board:", hc_result)
+    print("Final cost:", count_conflicts(hc_result))
+
+    print("\n--- Simulated Annealing ---")
+    print("Start board:", board)
+    print("Start cost:", count_conflicts(board))
+    sa_result = simulated_annealing(problem, board)
+    print("End board:", sa_result)
+    print("Final cost:", count_conflicts(sa_result))
+
+
+# --------------------------------------------------
+# EXTENSION 1 — VISUALISE THE BOARD
+# --------------------------------------------------
+
+def visualise_board(board):
+    n = len(board)
+    for row in range(n):
+        line = ""
+        for col in range(n):
+            if board[col] == row:
+                line += "Q "
+            else:
+                line += ". "
+        print(line.strip())
+
+
+# --------------------------------------------------
+# EXTENSION 2 — RANDOM RESTART HILL CLIMBING
+# --------------------------------------------------
+
+def random_restart_hill_climbing(problem, n, max_restarts=100):
+    for attempt in range(max_restarts):
+        board = [random.randint(0, n - 1) for _ in range(n)]
+        problem = QueensProblem(board)
+        result = hill_climbing(problem, board)
+        if count_conflicts(result) == 0:
+            print(f"Solution found after {attempt + 1} restart(s)")
+            return result
+    print(f"No solution found after {max_restarts} restarts")
+    return result
+
+
+# --------------------------------------------------
+# EXTENSION 3 — LARGER BOARDS
+# --------------------------------------------------
+
+def test_larger_boards():
+    import time
+    for n in [8, 20, 50]:
+        board = [random.randint(0, n - 1) for _ in range(n)]
+        problem = QueensProblem(board)
+
+        start = time.time()
+        hc_result = hill_climbing(problem, board)
+        hc_time = time.time() - start
+
+        start = time.time()
+        sa_result = simulated_annealing(problem, board)
+        sa_time = time.time() - start
+
+        neighbours = generate_neighbours(problem, board)
+
+        print(f"\nN={n}")
+        print(f"  Neighbours:           {len(neighbours)}")
+        print(f"  Hill Climbing cost:   {count_conflicts(hc_result)}  ({hc_time:.3f}s)")
+        print(f"  Simulated Annealing:  {count_conflicts(sa_result)}  ({sa_time:.3f}s)")
