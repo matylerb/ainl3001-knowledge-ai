@@ -83,7 +83,16 @@ def count_conflicts(board):
     #   1. in the same row
     #   2. on the same diagonal
 
-    pass
+    conflicts = 0  # start with zero conflicts
+
+    for i in range(len(board)):  # loop over every column
+        for j in range(i + 1, len(board)):  # compare with every column after i (avoids checking pairs twice)
+            if board[i] == board[j]:  # same row = conflict
+                conflicts += 1
+            if abs(board[i] - board[j]) == abs(i - j):  # same diagonal = conflict
+                conflicts += 1
+
+    return conflicts  # total number of attacking pairs
 
 
 # --------------------------------------------------
@@ -100,15 +109,14 @@ def generate_neighbours(problem, board):
         problem.result(state, action)
     """
 
-    neighbours = []
+    neighbours = []  # list to collect all neighbouring boards
 
-    # TODO:
-    #
-    # 1. Ask the problem for the available actions.
-    # 2. Apply each action.
-    # 3. Add the resulting state to neighbours.
+    actions = problem.actions(board)  # get every possible move from the current board
 
-    return neighbours
+    for action in actions:  # loop over each possible move
+        neighbours.append(problem.result(board, action))  # apply the move and add the resulting board
+
+    return neighbours  # return all neighbouring boards
 
 
 # --------------------------------------------------
@@ -140,11 +148,20 @@ def hill_climbing(problem, start_board):
         return current
     """
 
-    current = start_board
+    current = start_board  # start from the given board
 
     # TODO
 
-    pass
+    while True:  # keep going until we manually break out
+        neighbours = generate_neighbours(problem, current)  # get all boards reachable in one move
+        best = min(neighbours, key=count_conflicts)  # find the neighbour with the fewest conflicts
+
+        if count_conflicts(best) < count_conflicts(current):  # if best neighbour is better than current
+            current = best  # move to it
+        else:
+            break  # no improvement possible, stop
+
+    return current  # return the best board found
 
 
 # --------------------------------------------------
@@ -162,14 +179,27 @@ def simulated_annealing(problem, start_board):
     This can help escape local minima.
     """
 
-    current = start_board
+    current = start_board  # start from the given board
 
-    temperature = 10.0
-    cooling_rate = 0.95
+    temperature = 10.0  # start hot — willing to accept bad moves
+    cooling_rate = 0.95  # multiply temperature by this each iteration to cool down
 
     # TODO
 
-    pass
+    while temperature > 0.1:  # keep going until temperature is too cold
+        neighbours = generate_neighbours(problem, current)  # get all boards reachable in one move
+        next_board = random.choice(neighbours)  # pick a random neighbour (not necessarily the best)
+
+        delta = count_conflicts(next_board) - count_conflicts(current)  # positive = worse, negative = better
+
+        if delta < 0:  # next_board has fewer conflicts — always move to it
+            current = next_board
+        elif random.random() < math.exp(-delta / temperature):  # next_board is worse — maybe move anyway
+            current = next_board  # high temperature makes this more likely
+
+        temperature *= cooling_rate  # cool down by 5% each iteration
+
+    return current  # return the best board found
 
 
 # --------------------------------------------------
