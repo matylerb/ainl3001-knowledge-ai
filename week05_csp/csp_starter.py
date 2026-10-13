@@ -185,6 +185,12 @@ def backtracking_search(assignment):
 # Six regions with three possible colours each give 3 ** 6 = 729
 # complete assignments. Why can backtracking avoid checking all 729?
 
+#Backtracking prunes entire branches early. 
+# If you assign WA=Red and NT=Red, 
+# you immediately detect a violation and abandon that path
+# without ever trying all combinations for SA, Q, NSW, V underneath it. 
+# That's potentially hundreds of assignments skipped in one go
+
 
 # --------------------------------------------------
 # TESTING AREA
