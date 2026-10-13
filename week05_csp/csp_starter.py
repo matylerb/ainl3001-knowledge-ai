@@ -109,7 +109,13 @@ def select_unassigned_variable(assignment):
     # variables have been assigned.
     #
 
-    
+    for var in variables:
+        if var not in assignment:
+            return var
+
+    return None
+
+
 
 
 
@@ -117,7 +123,26 @@ def select_unassigned_variable(assignment):
     # For each unassigned variable, temporarily try each colour,
     # check is_valid_assignment(), and undo the temporary assignment.
     # Count legal colours and choose the variable with the fewest.
-    pass
+
+    best_var = None 
+    best_count = float('inf')
+
+    for var in variables:
+        if var not in assignment:
+            legal_count = 0
+            for colour in domains[var]:
+                assignment[var] = colour
+                if is_valid_assignment(assignment):
+                    legal_count+=1
+                del assignment[var]
+
+            if legal_count < best_count:
+                best_count =legal_count
+                best_var = var
+
+        return best_var
+            
+    
 
 
 # --------------------------------------------------
@@ -135,8 +160,22 @@ def backtracking_search(assignment):
     # 6. Otherwise remove the temporary assignment (backtrack).
     # 7. Return None if every colour fails.
 
+    if len(assignment) == len(variables):  # all assigned
+        return assignment.copy()
 
-    pass
+    var = select_unassigned_variable(assignment)  # pick next var
+
+    for colour in domains[var]:
+        assignment[var] = colour
+        if is_valid_assignment(assignment):
+            result = backtracking_search(assignment)  # recurse
+            if result is not None:
+                return result
+        del assignment[var]  # backtrack
+
+    return None
+
+
 
 
 # --------------------------------------------------
