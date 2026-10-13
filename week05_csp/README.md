@@ -133,10 +133,16 @@ example_assignment = {
 
 Before writing any code, answer these questions:
 
-1. Is this assignment valid?
+1. Is this assignment valid? No, WA and NT are both red and SA and V are both Green
 2. Which neighbouring pairs violate a constraint?
+
+WA and NT and SA and V
 3. How could you correct the assignment?
+Make WA Green V Red
+
 4. Why is it useful to detect violations early?
+
+So we can implement changes before going ahead
 
 Check your answers against the constraints list.
 

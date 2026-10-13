@@ -75,7 +75,20 @@ def is_valid_assignment(assignment):
     # 2. If BOTH regions have been assigned, compare their colours.
     # 3. Return False if neighbouring regions have the same colour.
     # 4. Otherwise return True.
-    pass
+
+
+    #first assign colour to a state, any colour
+    #second loop through each state and their neighbouring constraints
+    #third check if the assigned colour to each state matches their neighbour
+    #fourth if it does then return a false otherwise return true 
+
+
+    for (regionA, regionB) in constraints:
+        if regionA in assignment and regionB in assignment:
+            if assignment[regionA] == assignment[regionB]:
+                return False
+    return True 
+    
 
 
 # --------------------------------------------------
@@ -95,6 +108,11 @@ def select_unassigned_variable(assignment):
     # Return the first variable not in assignment, or None if all
     # variables have been assigned.
     #
+
+    
+
+
+
     # TASK 5 TODO (after backtracking works):
     # For each unassigned variable, temporarily try each colour,
     # check is_valid_assignment(), and undo the temporary assignment.
@@ -116,6 +134,8 @@ def backtracking_search(assignment):
     # 5. Return the recursive result if a solution was found.
     # 6. Otherwise remove the temporary assignment (backtrack).
     # 7. Return None if every colour fails.
+
+
     pass
 
 
