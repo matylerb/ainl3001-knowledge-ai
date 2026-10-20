@@ -35,9 +35,9 @@ print("Which branch should MAX choose, and why?")
 # BOARD — X plays next (three X marks and two O marks).
 # Board positions are numbered 0 to 8, left to right, top to bottom.
 board = [
-    "X", "O", "X",
-    " ", "O", " ",
-    " ", " ", "X",
+    " ", " ", " ",
+    " ", " ", " ",
+    " ", " ", " ",
 ]
 
 WINNING_LINES = [
@@ -54,7 +54,11 @@ WINNING_LINES = [
 def print_board(state):
     """Display the nine cells as a 3-by-3 board."""
     # TODO: Print three rows of three cells.
-    pass
+
+    for i in range(0, 9, 3):
+        print(state[i] + " | " + state[i+1] + " | " + state[i+2])
+        if i < 6:
+            print("--|---|--")
 
 
 # --------------------------------------------------
@@ -64,7 +68,8 @@ def print_board(state):
 def available_moves(state):
     """Return indices of empty cells (0 through 8)."""
     # TODO: Find every position containing " ".
-    pass
+
+    return [i for i, cell in enumerate(state) if cell == " "]
 
 
 # --------------------------------------------------
@@ -77,7 +82,13 @@ def make_move(state, move, player):
     Assume move is legal. Do not modify the input board.
     """
     # TODO: Copy the board and place the player's mark.
-    pass
+
+    new_state = list(state)
+
+    new_state[move] = player
+
+    return new_state
+
 
 
 # --------------------------------------------------
@@ -87,7 +98,14 @@ def make_move(state, move, player):
 def check_winner(state):
     """Return 'X', 'O' or None by checking all winning lines."""
     # TODO: Check each (a, b, c) in WINNING_LINES.
-    pass
+
+    for a, b, c in WINNING_LINES: 
+        if state[a] == state[b] == state[c] and state[a] != " ": 
+            return state[a]
+
+    return None
+
+
 
 
 # --------------------------------------------------
@@ -97,7 +115,8 @@ def check_winner(state):
 def is_terminal(state):
     """Return True for a win or a full board (draw)."""
     # TODO: Detect a winner OR no remaining empty cells.
-    pass
+
+    return check_winner(state) is not None or len(available_moves(state)) == 0
 
 
 # --------------------------------------------------
@@ -110,7 +129,13 @@ def utility(state):
     Minimax calls this only at terminal states.
     """
     # TODO: Use check_winner() and return +1, -1 or 0.
-    pass
+    winner = check_winner(state)
+    if winner == "X":
+        return 1
+    elif winner == "O":
+        return -1
+    else:
+        return 0
 
 
 # --------------------------------------------------
@@ -129,7 +154,22 @@ def minimax(state, maximizing, counter):
     # 3. For X (MAX), recursively choose the highest score.
     # 4. For O (MIN), recursively choose the lowest score.
     # Use make_move() to avoid changing the original board.
-    pass
+
+    counter["nodes"] += 1
+    if is_terminal(state):
+        return utility(state)
+    if maximizing:
+        best = float("-inf")
+        for move in available_moves(state):
+            score = minimax(make_move(state, move, "X"), False, counter)
+            best = max(best, score)
+        return best
+    else:
+        best = float("inf")
+        for move in available_moves(state):
+            score = minimax(make_move(state, move, "O"), True, counter)
+            best = min(best, score)
+        return best
 
 
 # --------------------------------------------------
@@ -144,7 +184,16 @@ def best_move(state, counter):
     # TODO: Try each legal X move, call minimax() for O's turn,
     # and return the move with the highest score.
     # If the board is terminal, return None.
-    pass
+
+    if is_terminal(state):
+        return None
+    best_score = float("-inf")
+    best_action = None
+    for move in available_moves(state):
+        score = minimax(make_move(state, move, "X"), False, counter)
+        if score > best_score:
+            best_score, best_action = score, move
+    return best_action
 
 
 # --------------------------------------------------
@@ -161,7 +210,29 @@ def alpha_beta(state, maximizing, alpha, beta, counter):
     # - MAX updates alpha; MIN updates beta.
     # - Stop exploring remaining moves if alpha >= beta.
     # - Count visited nodes exactly as in minimax().
-    pass
+
+    counter["nodes"] += 1
+
+    if is_terminal(state):
+        return utility(state)
+    if maximizing:
+        best = float("-inf")
+        for move in available_moves(state):
+            score = alpha_beta(make_move(state, move, "X"), False, alpha, beta, counter)
+            best = max(best, score)
+            alpha = max(alpha, best)
+            if alpha >= beta:
+                break
+        return best
+    else:
+        best = float("inf")
+        for move in available_moves(state):
+            score = alpha_beta(make_move(state, move, "O"), True, alpha, beta, counter)
+            best = min(best, score)
+            beta = min(beta, best)
+            if alpha >= beta:
+                break
+        return best
 
 
 # --------------------------------------------------
@@ -173,7 +244,17 @@ def best_move_alpha_beta(state, counter):
     # TODO: Like best_move(), but call alpha_beta().
     # Start alpha at -infinity and beta at +infinity.
     # Update alpha after each candidate X move.
-    pass
+
+    if is_terminal(state):
+        return None
+    alpha = float("-inf")
+    beta = float("inf")
+    best_action = None
+    for move in available_moves(state):
+        score = alpha_beta(make_move(state, move, "X"), False, alpha, beta, counter)
+        if score > alpha:
+            alpha, best_action = score, move
+    return best_action
 
 
 # --------------------------------------------------
@@ -206,6 +287,12 @@ if __name__ == "__main__":
 
     print("\nReflection:")
     print("1. Why is Tic-Tac-Toe a search problem?")
+    print("1. finding the best move requires exlporing a space of possiible future states")
     print("2. Why does Minimax assume an optimal opponent?")
+    print("2. because it is the safest assumption, if you assume that your opponent plays perfectly and they dont, then you still win or draw, therefore you can only do better, if you assumed a weak opponent and they played well then your strat would fall apart, Minimax gaurantess you always pick the best possible outcome")
+
     print("3. What is the purpose of a utility function?")
+    print("3. translates the game into a number that the algorithm can compare. minimax needs to rank states against each other, needs to be converted to +1 0 or -1")
+
     print("4. What happens as games become larger?")
+    print("4. the game tree grows exponentially, each extra possible move multiplies the number of states to explore. Bigger games need depth limits. heurisitc evaluatino functnios and pruning like alpha beta")

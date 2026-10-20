@@ -32,6 +32,8 @@ Study the small tree printed by the starter:
 
 Discuss: What does each MIN node return? What does MAX choose? Which branch should MAX follow? Explain why MIN and MAX make different choices.
 
+**Answer:** The left MIN node sees 3 and 5 and returns **3** (the lowest). The right MIN node sees 2 and 9 and returns **2** (the lowest). MAX then sees 3 and 2 and chooses the **left branch (3)** because it is the highest value available. MIN picks the lowest because it represents O, who wants to minimise X's score. MAX picks the highest because it represents X, who wants the best outcome for themselves.
+
 ## Task 1 — Board representation
 
 The board is a nine-element list in row-major order. Empty cells contain a space (`" "`). Positions are numbered as follows:
@@ -67,11 +69,15 @@ Use `make_move()` to create a fresh board for each possible move. Do not alter t
 
 Why does MAX take the largest score, while MIN takes the smallest?
 
+**Answer:** MAX represents X, who wants to win (+1). MIN represents O, who wants X to lose (-1). Each player picks the move that is best for them — MAX always takes the highest score available, MIN always takes the lowest. This models both players playing optimally against each other.
+
 ## Task 4 — Choose the AI's move
 
 Implement `best_move(state, counter)` to choose the best move for **X**. For each legal X move, call `minimax()` for the resulting position with **O to play next**. Return the index of the highest-scoring move. Return `None` if the game is already over. If moves tie, choose the first in the list.
 
 The testing area prints the selected move and displays the resulting board. The starting position has an immediate winning move for X. Can you identify it before running the solution?
+
+**Answer:** Position 5 (middle-right). Playing there gives X three in a row down the right column (positions 2, 5, 8).
 
 **Optional interaction:** Adapt the testing code to ask a human for an O move and alternate between the human and the X agent. You can also explore AI versus AI. This is not required for the core lab.
 
@@ -87,6 +93,8 @@ Increment it **once per call to the recursive search function**, including termi
 
 How many nodes does Minimax visit from the supplied board? What might happen on a much larger board?
 
+**Answer:** Minimax visits **31 nodes** from the supplied board. On a much larger board the game tree grows exponentially — each extra move multiplies the number of states to explore. Full Minimax quickly becomes computationally impossible, which is why depth limits, heuristic evaluation, and pruning (like Alpha-Beta) are needed.
+
 ## Task 6 — Alpha-Beta Pruning
 
 Implement `alpha_beta(state, maximizing, alpha, beta, counter)` and `best_move_alpha_beta(state, counter)`.
@@ -101,10 +109,12 @@ Record your results:
 
 | Algorithm | Chosen move | Nodes visited |
 |---|---|---|
-| Minimax | | |
-| Alpha-Beta | | |
+| Minimax | 5 | 31 |
+| Alpha-Beta | 5 | 17 |
 
 Did both choose the same move? Which visited fewer nodes? Does Alpha-Beta always prune the same amount regardless of move ordering?
+
+**Answer:** Yes, both chose move 5. Alpha-Beta visited fewer nodes (17 vs 31). Alpha-Beta does not always prune the same amount — the order moves are explored matters. If the best moves are tried first, more branches can be pruned early. With worst-case ordering, Alpha-Beta degenerates to the same cost as Minimax.
 
 ## GitHub task
 
@@ -126,9 +136,16 @@ git push origin main
 ## Reflection
 
 1. Why is Tic-Tac-Toe considered a search problem?
+   Finding the best move requires exploring a space of possible future states. You cannot just look at the current board — you must search forward through all possible sequences of moves to find the optimal choice.
+
 2. Why does Minimax assume an optimal opponent?
+   Because it is the safest assumption. If you assume the opponent plays perfectly and they do not, you still win or draw — you can only do better. If you assumed a weak opponent and they played well, your strategy would fail. Minimax guarantees the best outcome against the worst case.
+
 3. What is the purpose of a utility function?
+   It translates a game outcome into a number the algorithm can compare. Minimax cannot reason about "X won" vs "draw" mathematically without converting them to +1, 0, -1. The utility function is the bridge between game rules and the search algorithm.
+
 4. What happens as games become larger?
+   The game tree grows exponentially — each extra move multiplies the number of states to explore. Tic-Tac-Toe has roughly 255,000 possible games, which is trivial. Chess has more possible games than atoms in the observable universe. Larger games need depth limits, heuristic evaluation functions, and pruning like Alpha-Beta to be practical.
 
 ## Extensions
 
@@ -140,12 +157,12 @@ git push origin main
 
 ## Checklist
 
-- [ ] Explain the manual MIN/MAX tree.
-- [ ] Display a board, list moves, and return a copied board after a move.
-- [ ] Detect wins, draws and terminal states.
-- [ ] Implement recursive Minimax and choose a move for X.
-- [ ] Count visited nodes consistently.
-- [ ] Implement Alpha-Beta and compare it with Minimax.
-- [ ] Answer the reflection questions and push work to your fork.
+- [x] Explain the manual MIN/MAX tree.
+- [x] Display a board, list moves, and return a copied board after a move.
+- [x] Detect wins, draws and terminal states.
+- [x] Implement recursive Minimax and choose a move for X.
+- [x] Count visited nodes consistently.
+- [x] Implement Alpha-Beta and compare it with Minimax.
+- [x] Answer the reflection questions and push work to your fork.
 
 **Key takeaway:** Minimax chooses a move by considering an opponent who plays optimally. Alpha-Beta Pruning avoids exploring branches that cannot affect the final decision.
