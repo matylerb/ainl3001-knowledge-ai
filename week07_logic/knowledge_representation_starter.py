@@ -8,7 +8,7 @@ BSP
 """
 
 # TASK 1 — Represent facts (provided; inspect and experiment).
-facts = {"rainy", "weekday"}
+facts = {"rainy", "weekday", "cold"}
 
 # TASK 2 — Represent rules (provided; inspect and experiment).
 # Each rule is (list_of_required_facts, conclusion).
@@ -20,6 +20,7 @@ rules = [
 ]
 
 
+# Forward chaining: start from known facts, apply every matching rule, repeat until no new facts can be added.
 def forward_chaining(known_facts, rules):
     """Return all original and inferred facts without changing known_facts.
 
@@ -30,7 +31,20 @@ def forward_chaining(known_facts, rules):
     4. Return the completed set.
     """
     # TODO
-    pass
+
+    inferred_facts = set(known_facts)  # start with what we already know
+
+    changed = True
+    while changed:  # keep looping until a full pass adds nothing new
+        changed = False
+
+        for conditions, conclusion in rules:
+            if all(c in inferred_facts for c in conditions):  # if every condition is already known...
+                if conclusion not in inferred_facts: # ...and we haven't added this conclusion yet...
+                    inferred_facts.add(conclusion) # ...add it as a new fact
+                    changed = True # flag that something changed, so loop again
+
+    return inferred_facts
 
 
 def query(inferred_facts, statement):
@@ -39,7 +53,24 @@ def query(inferred_facts, statement):
     A False result means 'not established', not necessarily 'false'.
     """
     # TODO
+
+    return statement in inferred_facts
     pass
+
+# Backward chaining: start from a goal, find a rule that proves it, then recursively prove each of that rule's conditions.
+def backward_chaining(goal, known_facts, rules):
+    """TASK 5  - Return True if goal can be proven from known_facts using rules.
+
+    Starts from the goal and works backwards: find a rule that concludes
+    the goal, then recursively check if all that rule's conditions are provable.
+    """
+    if goal in known_facts: # base case: if the goal is already a known fact, no need to search
+        return True
+    for conditions, conclusion in rules:
+        if conclusion == goal:  # find a rule whose conclusion matches the goal we're trying to prove
+            if all(backward_chaining(c, known_facts, rules) for c in conditions):  # recursively prove each condition
+                return True # all conditions provable, so the goal is provable
+    return False # no rule could prove the goal
 
 
 if __name__ == "__main__":
@@ -65,8 +96,13 @@ if __name__ == "__main__":
         for statement in ("take_umbrella", "stay_dry", "wear_coat"):
             print(f"Can infer {statement}? {query(inferred, statement)}")
 
-    print("\nTASK 5 — BACKWARD CHAINING (discussion)")
-    print("Goal: stay_dry. Which rule concludes it? What must be true first?")
+    print("\n" + "=" * 55)
+    print("TASK 5 — BACKWARD CHAINING")
+    print("=" * 55)
+    for goal in ("stay_dry", "wear_coat", "take_umbrella"):
+        result = backward_chaining(goal, facts, rules)
+        print(f"Can backward chaining prove '{goal}'? {result}")
+
     print("\nTASK 6 — LOGIC DISCUSSION")
     print("Is 'IF rainy THEN take_umbrella' always true in the real world?")
     print("What assumptions does the rule make?")

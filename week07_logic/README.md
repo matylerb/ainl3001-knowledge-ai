@@ -62,10 +62,10 @@ Each tuple contains a **list of conditions** and a **conclusion**. Every conditi
 
 Before coding, discuss these questions with a peer:
 
-1. Can we infer `take_umbrella`? Why?
-2. Can we infer `stay_dry`? Why?
-3. Can we infer `wear_coat`? Why or why not?
-4. In which order might new facts be discovered?
+1. Can we infer `take_umbrella`? Why? Yes — `rainy` is a known fact and the rule `IF rainy THEN take_umbrella` fires immediately.
+2. Can we infer `stay_dry`? Why? Yes — once `take_umbrella` is inferred, the rule `IF take_umbrella THEN stay_dry` fires in the next pass. One rule's conclusion activates another.
+3. Can we infer `wear_coat`? Why or why not? No — the rule requires both `rainy` AND `cold`, but `cold` is not in the initial facts set, so the rule cannot fire.
+4. In which order might new facts be discovered? First `take_umbrella` (only needs `rainy`, which is already known), then `stay_dry` (now that `take_umbrella` has been added). `wear_coat` would only follow if `cold` were added first.
 
 Think about whether a conclusion from one rule can activate another rule.
 
@@ -73,7 +73,11 @@ Think about whether a conclusion from one rule can activate another rule.
 
 Inspect the provided `facts` set. Why is a Python **set** suitable for storing known facts? What happens if you try to add the same fact twice?
 
+A set is suitable because facts are unordered and unique — a set automatically ignores duplicates, so adding the same fact twice has no effect and doesn't corrupt the knowledge base. This matches how facts work in logic: knowing `rainy` twice is the same as knowing it once.
+
 Experiment by adding `cold` later, after you have implemented forward chaining. What changes?
+
+Adding `cold` to the initial facts means both conditions of the rule `IF rainy AND cold THEN wear_coat` are now satisfied, so `wear_coat` gets added to the inferred facts set. The inferred set grows from 5 facts to 6.
 
 ## Task 2 — Represent rules
 
@@ -122,16 +126,18 @@ Test these queries:
 
 Check that `facts` still contains only the original two facts after forward chaining. Then add `cold` to the initial facts and run the program again. Can you now infer `wear_coat`?
 
+yes since we have inferred cold — `cold` is now a known fact, so both conditions of `IF rainy AND cold THEN wear_coat` are met and `wear_coat` is added to the inferred set.
+
 ## Task 5 — Backward chaining (manual exercise)
 
 Forward chaining starts from known facts and asks **what else follows?** Backward chaining starts from a goal and asks **what would need to be true?**
 
 Start with the goal `stay_dry`:
 
-1. Which rule has `stay_dry` as its conclusion?
-2. What condition does that rule require?
-3. Which rule could establish that condition?
-4. Does the chain ultimately reach an initial fact?
+1. Which rule has `stay_dry` as its conclusion? The rule `IF take_umbrella THEN stay_dry`.
+2. What condition does that rule require? `take_umbrella` must be established first.
+3. Which rule could establish that condition? The rule `IF rainy THEN take_umbrella` — and `rainy` is already a known initial fact.
+4. Does the chain ultimately reach an initial fact? Yes — tracing back: `stay_dry` ← `take_umbrella` ← `rainy`, and `rainy` is in the original facts set.
 
 Draw the chain of reasoning. **No backward-chaining implementation is required** for the core lab.
 
@@ -141,9 +147,9 @@ Consider the rule `IF rainy THEN take_umbrella`.
 
 Discuss:
 
-1. Does this rule have to be true in the real world?
-2. What assumptions are we making when we include it in the knowledge base?
-3. How is logical inference from an accepted rule different from statistical reasoning under uncertainty?
+1. Does this rule have to be true in the real world? No — it is a simplification. In reality you might be indoors, not own an umbrella, or simply choose not to take one. The rule only holds within the closed assumptions of this knowledge base.
+2. What assumptions are we making when we include it in the knowledge base? We are assuming the person is going outside, has an umbrella available, and always acts on the rule. We are also assuming the rule applies universally with no exceptions — which is rarely true in the real world.
+3. How is logical inference from an accepted rule different from statistical reasoning under uncertainty? Logical inference is binary and certain: if the conditions are met, the conclusion always follows with 100% confidence. Statistical reasoning assigns probabilities — e.g. "if it is rainy there is an 80% chance the person takes an umbrella." Logic cannot express degrees of belief or uncertainty; it treats every rule as absolutely true within the knowledge base.
 
 A useful distinction: **logical entailment** means a conclusion follows from the knowledge base under the logic's rules. It does not guarantee that the knowledge base accurately describes reality.
 
