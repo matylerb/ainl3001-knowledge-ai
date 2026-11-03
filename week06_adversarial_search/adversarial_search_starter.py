@@ -35,9 +35,9 @@ print("Which branch should MAX choose, and why?")
 # BOARD — X plays next (three X marks and two O marks).
 # Board positions are numbered 0 to 8, left to right, top to bottom.
 board = [
-    " ", " ", " ",
-    " ", " ", " ",
-    " ", " ", " ",
+    "X", "O", "X",
+    " ", "O", " ",
+    " ", " ", "X",
 ]
 
 WINNING_LINES = [
